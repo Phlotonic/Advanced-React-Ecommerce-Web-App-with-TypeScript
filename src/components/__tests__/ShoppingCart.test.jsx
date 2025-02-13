@@ -2,9 +2,11 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ShoppingCart from '../ShoppingCart';
 import { Provider } from 'react-redux';
-import store from '../../app/store';
+import store from '../../store';
 import { addToCart, removeFromCart, clearCart } from '../../features/cart/cartSlice';
 import { useTranslation } from 'react-i18next';
+import '@testing-library/jest-dom'
+import { MemoryRouter } from 'react-router-dom';
 
 // Mock useTranslation hook
 jest.mock('react-i18next', () => ({
@@ -15,7 +17,9 @@ describe('ShoppingCart Component', () => {
     it('renders "Your cart is empty" message when cart is empty', () => {
         render(
             <Provider store={store}>
-                <ShoppingCart />
+                <MemoryRouter>
+                    <ShoppingCart />
+                </MemoryRouter>
             </Provider>
         );
         expect(screen.getByText('cartEmpty')).toBeInTheDocument();
@@ -34,7 +38,9 @@ describe('ShoppingCart Component', () => {
 
         render(
             <Provider store={testStore}>
-                <ShoppingCart />
+                <MemoryRouter>
+                    <ShoppingCart />
+                </MemoryRouter>
             </Provider>
         );
 
@@ -55,7 +61,9 @@ describe('ShoppingCart Component', () => {
 
         render(
             <Provider store={testStore}>
-                <ShoppingCart />
+                <MemoryRouter>
+                    <ShoppingCart />
+                </MemoryRouter>
             </Provider>
         );
 
@@ -77,7 +85,9 @@ describe('ShoppingCart Component', () => {
 
         render(
             <Provider store={testStore}>
-                <ShoppingCart />
+                <MemoryRouter>
+                    <ShoppingCart />
+                </MemoryRouter>
             </Provider>
         );
 

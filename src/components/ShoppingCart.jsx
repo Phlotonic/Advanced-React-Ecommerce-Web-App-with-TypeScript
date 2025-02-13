@@ -64,7 +64,7 @@ function ShoppingCart() {
     if (cartItems.length === 0) {
         return (
             <Container className="mt-5 text-center">
-                <Alert variant="info" role="alert"> {/* Added role="alert" for screen readers */}
+                <Alert variant="info" role="alert">
                     <Alert.Heading>{t('cartEmpty')}</Alert.Heading>
                     <p>
                         {t('cartEmptyMessage')} <Link to="/home">{t('continueShopping')}</Link>
@@ -93,7 +93,7 @@ function ShoppingCart() {
                             <td>
                                 <Image
                                     src={item.image}
-                                    alt={item.title} // Added alt text for accessibility
+                                    alt={item.title}
                                     style={{ width: '50px', height: '50px', objectFit: 'contain' }}
                                     thumbnail
                                     className="me-2"
@@ -104,7 +104,7 @@ function ShoppingCart() {
                             <td>{item.quantity}</td>
                             <td>${(item.price * item.quantity).toFixed(2)}</td>
                             <td>
-                                <Button variant="danger" size="sm" aria-label={`Remove ${item.title} from cart`} onClick={() => handleRemoveFromCart(item.id)}> {/* Added aria-label for button */}
+                                <Button variant="danger" size="sm" aria-label={`Remove ${item.title} from cart`} onClick={() => handleRemoveFromCart(item.id)}>
                                     {t('remove')}
                                 </Button>
                             </td>
@@ -119,7 +119,7 @@ function ShoppingCart() {
 
             <Row className="mt-3 justify-content-between">
                 <Col md="auto">
-                    <Button variant="danger" onClick={handleClearCart} disabled={cartItems.length === 0} aria-label={t('clearCart')}> {/* Added aria-label for button */}
+                    <Button variant="danger" onClick={handleClearCart} disabled={cartItems.length === 0} aria-label={t('clearCart')}>
                         {t('clearCart')}
                     </Button>
                 </Col>
@@ -127,7 +127,7 @@ function ShoppingCart() {
                     <h3>{t('total')}: ${calculateTotal()}</h3>
                 </Col>
                 <Col md="auto">
-                    <Button variant="primary" size="lg" onClick={handleCheckout} disabled={cartItems.length === 0} aria-label={t('checkout')}> {/* Added aria-label for button */}
+                    <Button variant="primary" size="lg" onClick={handleCheckout} disabled={cartItems.length === 0} aria-label={t('checkout')}>
                         {t('checkout')}
                     </Button>
                 </Col>

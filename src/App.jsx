@@ -14,6 +14,7 @@ import DeleteUser from './components/DeleteUser';
 import NotFound from './components/NotFound'; 
 import UserContext from './context/UserContext'; 
 import OrderHistory from './components/OrderHistory';
+import './App.css';
 
 const queryClient = new QueryClient();
 

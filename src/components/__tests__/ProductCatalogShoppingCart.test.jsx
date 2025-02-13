@@ -3,9 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProductCatalog from '../ProductCatalog';
 import ShoppingCart from '../ShoppingCart';
 import { Provider } from 'react-redux';
-import store from '../../app/store';
+import store from '../../store';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import '@testing-library/jest-dom'
 
 // Mock useTranslation hook
 jest.mock('react-i18next', () => ({

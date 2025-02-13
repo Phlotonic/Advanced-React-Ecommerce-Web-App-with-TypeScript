@@ -1,42 +1,126 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* App.css */
+
+/* Basic Reset and Body Styles */
+body, html {
+  margin: 0;
+  padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+*, *::before, *::after {
+  box-sizing: border-box; /*  Ensures padding and border are included in element's total width and height */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body {
+  font-family: 'Arial', sans-serif; /* Choose a pleasant default font */
+  line-height: 1.6;
+  background-color: #f8f9fa; /* Light background color, common for websites */
+  color: #333; /* Dark text for good readability */
+  display: flex; /* Enable Flexbox for centering the content */
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Horizontally center content in the body */
+  min-height: 100vh; /* Make body at least the height of the viewport */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Main Container to Center Content */
+.app-container {
+  max-width: 1200px; /*  Maximum width of your content on larger screens */
+  width: 95%; /*  Take up 95% of the screen width on smaller screens, for responsiveness */
+  margin: 20px auto; /*  Auto margin on left/right to center horizontally, top/bottom margin for spacing */
+  padding: 20px;
+  background-color: #ffffff; /* White background for the main content area */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /*  Subtle shadow for visual separation */
+  border-radius: 8px; /*  Slightly rounded corners for a softer look */
 }
 
+/* Product Grid Styling (Assuming ProductCatalog uses React Bootstrap Row with g-4 class) */
+.row.product-grid { /*  Target the Row in ProductCatalog with class 'product-grid' */
+  display: grid; /* Enable CSS Grid layout */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive columns */
+  gap: 20px; /* Spacing between grid items (adjust to match Bootstrap's g-4 if needed) */
+}
+
+/* Style for Product Cards (adjust based on your Card component in ProductCatalog) */
 .card {
-  padding: 2em;
+  border: 1px solid #ddd; /* Light border for cards */
+  border-radius: 8px;
+  overflow: hidden; /*  Ensure image and content stay within card borders */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /*  Softer shadow for cards */
+  transition: transform 0.2s ease-in-out; /*  Smooth hover effect */
 }
 
-.read-the-docs {
-  color: #888;
+.card:hover {
+  transform: scale(1.02); /*  Slightly scale up on hover for interaction feedback */
+}
+
+.card-img-top {
+  object-fit: contain; /*  Ensure product images fit within the image area without distortion */
+  height: 200px; /*  Fixed height for product images, adjust as needed */
+  background-color: #f0f0f0; /*  Placeholder background for images while loading or if no image */
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.card-text {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.7rem;
+}
+
+.btn-primary {
+  background-color: #007bff; /*  Bootstrap primary button color */
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker shade for hover effect */
+  border-color: #0056b3;
+}
+
+
+/* Media Queries for Responsiveness */
+
+/* For tablets and larger smartphones (up to 768px width) */
+@media (max-width: 768px) {
+  .app-container {
+    width: 98%; /* Take up more width on smaller screens */
+    margin: 10px auto; /* Reduced margins */
+    padding: 15px;
+  }
+  .row.product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Adjust grid for smaller screens */
+  }
+  .card-img-top {
+    height: 180px; /* Slightly smaller image height on smaller screens */
+  }
+}
+
+/* For smaller smartphones (up to 576px width) */
+@media (max-width: 576px) {
+  .app-container {
+    width: 100%; /* Full width on very small screens */
+    margin: 0; /* No margins on very small screens */
+    padding: 10px;
+    border-radius: 0; /* No rounded corners on very small screens for full width look */
+    box-shadow: none; /* Remove shadow on full width mobile */
+  }
+  .row.product-grid {
+    grid-template-columns: 1fr; /* Single column grid for very small screens */
+  }
+  .card-img-top {
+    height: 150px; /* Even smaller image height for very small screens */
+  }
+  .card-title {
+    font-size: 1rem; /* Smaller title font size on mobile */
+  }
+  .card-text {
+    font-size: 0.9rem; /* Smaller text font size on mobile */
+  }
 }

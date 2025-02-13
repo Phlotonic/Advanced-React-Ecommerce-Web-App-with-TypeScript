@@ -75,7 +75,7 @@ function Login() {
                                 Login
                             </Button>
                         </Form>
-                    </div> {/* End optional form container styling */}
+                    </div>
                 </Col>
             </Row>
         </Container>
