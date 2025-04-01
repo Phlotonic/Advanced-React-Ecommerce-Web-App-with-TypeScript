@@ -12,7 +12,7 @@ const Register = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleRegister = async (e) => {
+    const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
         setShowErrorAlert(false); // Hide any previous error alerts
@@ -49,9 +49,15 @@ const Register = () => {
         } catch (error) {
             console.error('Registration error:', error);
             setShowErrorAlert(true);
-            setErrorMessage(error.message);
-        } finally {
-            setIsLoading(false);
+        
+            // Check the type of error before accessing .message
+            if (error instanceof Error) {
+                // If it's an Error object, we can safely use its message
+                setErrorMessage(error.message);
+            } else {
+                // If it's not an Error object, set a generic message
+                setErrorMessage('An unexpected error occurred. Please try again.');
+            }
         }
     };
 

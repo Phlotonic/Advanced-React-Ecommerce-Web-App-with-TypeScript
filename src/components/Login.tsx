@@ -3,8 +3,14 @@ import UserContext from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
-function Login() {
-    const [username, setUsername] = useState('');
+interface User {
+    name: string;
+    isLoggedIn: boolean;
+
+}
+
+function Login () {
+    const [username, setUsername] = useState<string>('');
     const { setUser } = useContext(UserContext);
     const navigate = useNavigate();
 
@@ -14,7 +20,7 @@ function Login() {
         console.log("Login.jsx useEffect: Retrieved storedUser from localStorage:", storedUser);
         if (storedUser) {
             try {
-                const userSession = JSON.parse(storedUser);
+                const userSession: User = JSON.parse(storedUser);
                 console.log("Login.jsx useEffect: Parsed userSession:", userSession);
                 setUser(userSession);
                 console.log("Login.jsx useEffect: setUser called with:", userSession);
