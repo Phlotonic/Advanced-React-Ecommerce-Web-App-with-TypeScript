@@ -19,26 +19,26 @@ import './App.css';
 const queryClient = new QueryClient();
 
 function App() {
-  const [user, setUser] = useState({ name: '', isLoggedIn: false}); // Keep your user state
+  const [user, setUser] = useState({ name: '', isLoggedIn: false});
 
   return (
     <QueryClientProvider client={queryClient}>
-      <UserContext.Provider value={{ user, setUser }}> {/* Keep UserContext.Provider if you are using UserContext */}
-        <BrowserRouter> {/* Use BrowserRouter directly */}
+      <UserContext.Provider value={{ user, setUser }}>
+        <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Login />} /> {/* Login Route */}
-            <Route path="/register" element={<Register />} /> {/* Register Route */}
-            <Route path="/home" element={<HomePage />} /> {/* Home Route */}
-            <Route path="/cart" element={<ShoppingCart />} /> {/* Cart Route */}
-            <Route path="/add-product" element={<AddProduct />} /> {/* Add Product Route */}
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/cart" element={<ShoppingCart />} />
+            <Route path="/add-product" element={<AddProduct />} />
             <Route path="/order-history" element={<OrderHistory />} />
-            <Route path="/logout" element={<Logout />} /> {/* Logout Route */}
-            <Route path="/update-profile" element={<UpdateUser />} /> {/* Update Profile Route */}
-            <Route path="/delete-user" element={<DeleteUser />} /> {/* Delete User Route - CORRECTED PATH */}
-            <Route path="*" element={<NotFound />} /> {/* Not Found Route */}
+            <Route path="/logout" element={<Logout />} />
+            <Route path="/update-profile" element={<UpdateUser />} />
+            <Route path="/delete-user" element={<DeleteUser />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </UserContext.Provider> {/* Keep UserContext.Provider if you are using UserContext */}
+      </UserContext.Provider>
     </QueryClientProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { useContext, useEffect } from 'react';
+import type { RootState } from '../store';
 import UserContext from '../context/UserContext';
 import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
@@ -7,7 +8,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 function HomePage() {
     const { user, setUser } = useContext(UserContext);
-    const cartCount = useSelector((state) => state.cart.totalItems);
+    const cartCount = useSelector((state: RootState) => state.cart.totalItems); 
     const navigate = useNavigate(); // Get navigate function
 
     useEffect(() => {

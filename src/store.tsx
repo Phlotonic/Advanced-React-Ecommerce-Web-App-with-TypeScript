@@ -10,3 +10,9 @@ const store = configureStore({
 });
 
 export default store;
+
+// Infer the `RootState` type from the store itself
+export type RootState = ReturnType<typeof store.getState>;
+
+// (Optional but recommended) Infer the `AppDispatch` type
+export type AppDispatch = typeof store.dispatch; 
