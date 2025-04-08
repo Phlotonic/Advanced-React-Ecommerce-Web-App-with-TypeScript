@@ -10,52 +10,64 @@ body, html {
   box-sizing: border-box; /*  Ensures padding and border are included in element's total width and height */
 }
 
+/* Body and Background Enhancements */
 body {
-  font-family: 'Arial', sans-serif; /* Choose a pleasant default font */
+  font-family: 'Roboto', sans-serif; /* Modern font */
+  background: linear-gradient(135deg, #1e3c72, #2a5298); /* Futuristic gradient background */
+  color: #e0e0e0; /* Light text for contrast */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
   line-height: 1.6;
-  background-color: #f8f9fa; /* Light background color, common for websites */
-  color: #333; /* Dark text for good readability */
   display: flex; /* Enable Flexbox for centering the content */
   flex-direction: column; /* Stack elements vertically */
   align-items: center; /* Horizontally center content in the body */
   min-height: 100vh; /* Make body at least the height of the viewport */
 }
 
-/* Main Container to Center Content */
+/* App Container Enhancements */
 .app-container {
-  max-width: 1200px; /*  Maximum width of your content on larger screens */
-  width: 95%; /*  Take up 95% of the screen width on smaller screens, for responsiveness */
-  margin: 20px auto; /*  Auto margin on left/right to center horizontally, top/bottom margin for spacing */
-  padding: 20px;
-  background-color: #ffffff; /* White background for the main content area */
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /*  Subtle shadow for visual separation */
+  max-width: 100%; /* Ensure the container spans the full width of the page */
+  margin: 0; /* Remove any margins */
+  padding: 20px; /* Keep some padding for content spacing */
+  background: rgba(255, 255, 255, 0.1); /* Transparent white for a futuristic feel */
+  backdrop-filter: blur(10px); /* Glassmorphism effect */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
   border-radius: 8px; /*  Slightly rounded corners for a softer look */
 }
 
 /* Product Grid Styling (Assuming ProductCatalog uses React Bootstrap Row with g-4 class) */
-.row.product-grid { /*  Target the Row in ProductCatalog with class 'product-grid' */
-  display: grid; /* Enable CSS Grid layout */
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive columns */
-  gap: 20px; /* Spacing between grid items (adjust to match Bootstrap's g-4 if needed) */
+.row.product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* Display 5 items per row */
+  gap: 20px; /* Maintain spacing between items */
 }
 
-/* Style for Product Cards (adjust based on your Card component in ProductCatalog) */
+/* Product Card Enhancements */
 .card {
-  border: 1px solid #ddd; /* Light border for cards */
+  background: rgba(255, 255, 255, 0.05); /* Transparent card background */
+  border: none; /* Remove border */
   border-radius: 8px;
   overflow: hidden; /*  Ensure image and content stay within card borders */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /*  Softer shadow for cards */
-  transition: transform 0.2s ease-in-out; /*  Smooth hover effect */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+  max-width: 300px; /* Limit the width of each card */
+  margin: 0 auto; /* Center the card within its column */
 }
 
 .card:hover {
-  transform: scale(1.02); /*  Slightly scale up on hover for interaction feedback */
+  transform: translateY(-10px); /* Lift effect on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
 }
 
 .card-img-top {
   object-fit: contain; /*  Ensure product images fit within the image area without distortion */
   height: 200px; /*  Fixed height for product images, adjust as needed */
   background-color: #f0f0f0; /*  Placeholder background for images while loading or if no image */
+  transition: transform 0.3s ease; /* Smooth image zoom */
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.1); /* Zoom effect on hover */
 }
 
 .card-body {
@@ -66,24 +78,28 @@ body {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
   font-weight: bold;
+  color: #ffffff; /* Bright text for titles */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* Subtle text shadow */
 }
 
 .card-text {
   font-size: 1rem;
-  color: #666;
+  color: #b0b0b0; /* Softer text color for descriptions */
   margin-bottom: 0.7rem;
 }
 
+/* Button Enhancements */
 .btn-primary {
-  background-color: #007bff; /*  Bootstrap primary button color */
-  border-color: #007bff;
+  background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Vibrant gradient */
+  border: none; /* Remove border */
+  color: #fff; /* White text */
+  transition: background 0.3s ease, transform 0.3s ease; /* Smooth transitions */
 }
 
 .btn-primary:hover {
-  background-color: #0056b3; /* Darker shade for hover effect */
-  border-color: #0056b3;
+  background: linear-gradient(135deg, #feb47b, #ff7e5f); /* Reverse gradient on hover */
+  transform: scale(1.05); /* Slightly enlarge on hover */
 }
-
 
 /* Media Queries for Responsiveness */
 
@@ -95,10 +111,14 @@ body {
     padding: 15px;
   }
   .row.product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Adjust grid for smaller screens */
+    grid-template-columns: repeat(2, 1fr); /* 2 items per row for smaller screens */
   }
   .card-img-top {
     height: 180px; /* Slightly smaller image height on smaller screens */
+  }
+  .card {
+    transform: none; /* Disable lift effect on smaller screens */
+    box-shadow: none; /* Simplify shadow on smaller screens */
   }
 }
 
@@ -112,7 +132,7 @@ body {
     box-shadow: none; /* Remove shadow on full width mobile */
   }
   .row.product-grid {
-    grid-template-columns: 1fr; /* Single column grid for very small screens */
+    grid-template-columns: 1fr; /* 1 item per row for very small screens */
   }
   .card-img-top {
     height: 150px; /* Even smaller image height for very small screens */
@@ -122,5 +142,15 @@ body {
   }
   .card-text {
     font-size: 0.9rem; /* Smaller text font size on mobile */
+  }
+  .btn-primary {
+    font-size: 0.9rem; /* Adjust button size for small screens */
+  }
+}
+
+/* For medium and larger screens (768px and above) */
+@media (min-width: 768px) {
+  .row.product-grid {
+    grid-template-columns: repeat(3, 1fr); /* Ensure 3 items per row on medium and larger screens */
   }
 }

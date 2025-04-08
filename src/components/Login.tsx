@@ -1,82 +1,174 @@
 import React, { useContext, useEffect, useState } from 'react';
-import UserContext from '../context/UserContext';
+// Import the UserContext to access shared user state and setter function
+import UserContext from '../context/UserContext'; 
+// Import useNavigate for programmatic redirection after login
 import { useNavigate } from 'react-router-dom';
+// Import layout and form components from React Bootstrap
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+// If UserState is exported from UserContext.tsx, prefer importing it:
+// import type { UserState } from '../context/UserContext'; 
 
+// Defines the structure for user data used locally in this component.
+// For consistency, consider importing 'UserState' from UserContext.tsx if it matches.
 interface User {
     name: string;
     isLoggedIn: boolean;
-
+    // Add other properties if defined in UserState from context
 }
 
-function Login () {
-    const [username, setUsername] = useState<string>('');
-    const { setUser } = useContext(UserContext);
-    const navigate = useNavigate();
+/**
+ * Login Component
+ * Handles user login by taking a username, updating the global user context,
+ * saving the session to localStorage, and redirecting the user.
+ * Also attempts to automatically log in user if a valid session exists in localStorage.
+ * NOTE: This version simulates login based on username only; no password or API call involved.
+ */
+function Login() {
+    // --- State and Context ---
 
+    // State to hold the value entered in the username input field
+    const [username, setUsername] = useState<string>(''); 
+    // Get the setUser function from the UserContext to update the global user state
+    const { setUser } = useContext(UserContext); 
+    // Get the navigate function from React Router for redirection
+    const navigate = useNavigate(); 
+
+    // --- Effects ---
+
+    // This effect runs once when the component mounts (due to stable 'navigate' dependency).
+    // Its purpose is to check if a user session already exists in localStorage and automatically log the user in.
     useEffect(() => {
-        console.log("Login.jsx useEffect: Checking for stored user session...");
+        // Debugging log
+        console.log("Login.tsx useEffect: Checking for stored user session...");
+        // Attempt to retrieve the user session data stored previously
         const storedUser = localStorage.getItem('userSession');
-        console.log("Login.jsx useEffect: Retrieved storedUser from localStorage:", storedUser);
+        // Debugging log
+        console.log("Login.tsx useEffect: Retrieved storedUser from localStorage:", storedUser);
+        
+        // Check if any session data was found
         if (storedUser) {
             try {
-                const userSession: User = JSON.parse(storedUser);
-                console.log("Login.jsx useEffect: Parsed userSession:", userSession);
-                setUser(userSession);
-                console.log("Login.jsx useEffect: setUser called with:", userSession);
+                // Attempt to parse the stored JSON string back into an object.
+                // Explicitly typing the parsed result to match the expected User structure.
+                // Using UserState imported from context would be more consistent if available.
+                const userSession: User = JSON.parse(storedUser); 
+                // Debugging log
+                console.log("Login.tsx useEffect: Parsed userSession:", userSession);
 
+                // Update the global user state via context with the retrieved session data
+                setUser(userSession);
+                // Debugging log
+                console.log("Login.tsx useEffect: setUser called with:", userSession);
+
+                // --- Redirection Logic (based on stored session) ---
+                // Check if the restored user is 'admin' (case-insensitive)
                 if (userSession.name.toLowerCase() === 'admin') {
-                    navigate('/add-product');
-                    console.log("Login.jsx useEffect: Navigating to /add-product (admin)");
+                    // Navigate admin users to the Add Product page
+                    navigate('/add-product'); 
+                    // Debugging log
+                    console.log("Login.tsx useEffect: Navigating to /add-product (admin)");
                 } else {
-                    navigate('/home');
-                    console.log("Login.jsx useEffect: Navigating to /home (non-admin)");
+                    // Navigate regular users to the Home page
+                    navigate('/home'); 
+                    // Debugging log
+                    console.log("Login.tsx useEffect: Navigating to /home (non-admin)");
                 }
             } catch (error) {
-                console.error("Login.jsx useEffect: Error parsing stored user session:", error);
-                localStorage.removeItem('userSession'); // Clear potentially corrupted data
+                // Handle errors during JSON parsing (e.g., corrupted data in localStorage)
+                console.error("Login.tsx useEffect: Error parsing stored user session:", error);
+                // Remove the potentially corrupted item from localStorage
+                localStorage.removeItem('userSession'); 
             }
         } else {
-            console.log("Login.jsx useEffect: No stored user session found.");
+            // Debugging log
+            console.log("Login.tsx useEffect: No stored user session found.");
         }
-    }, [navigate]); // Corrected dependency array: removed 'setUser'
+        // Dependency array: 'navigate' is included as per React hook rules. 'setUser' is often
+        // stable from context and usually omitted, making this effect run only once on mount.
+    }, [navigate]); // Dependency array ensures this effect runs primarily on mount
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        console.log("Login.jsx handleLogin: Login button clicked");
-        console.log("Login.jsx handleLogin: Username entered:", username);
+    // --- Event Handlers ---
+
+    // Handles the form submission event when the Login button is clicked.
+    const handleLogin = (e: React.FormEvent<HTMLFormElement>) => { // Added type for event 'e'
+        // Prevent the default form submission behavior which causes a page reload.
+        e.preventDefault(); 
+        // Debugging log
+        console.log("Login.tsx handleLogin: Login button clicked");
+        // Debugging log
+        console.log("Login.tsx handleLogin: Username entered:", username);
+
+        // --- !!! SIMULATED LOGIN - NO AUTHENTICATION !!! ---
+        // In a real app, you would typically send the username and password 
+        // to an API endpoint here for verification before proceeding.
+        // This example assumes login is successful if a username is entered.
+
+        // Create the user data object based on the entered username.
+        // Assumes successful login and sets isLoggedIn to true. Matches 'User'/'UserState' type.
         const userData = { name: username, isLoggedIn: true };
-        console.log("Login.jsx handleLogin: Creating userData:", userData);
-        setUser(userData);
-        console.log("Login.jsx handleLogin: setUser called with:", userData);
-        localStorage.setItem('userSession', JSON.stringify(userData)); // Save user session to local storage
-        console.log("Login.jsx handleLogin: Stored userSession in localStorage:", userData);
+        // Debugging log
+        console.log("Login.tsx handleLogin: Creating userData:", userData);
 
+        // Update the global user state via context
+        setUser(userData);
+        // Debugging log
+        console.log("Login.tsx handleLogin: setUser called with:", userData);
+        
+        // Persist the user session data in localStorage for subsequent visits/reloads.
+        localStorage.setItem('userSession', JSON.stringify(userData)); 
+        // Debugging log
+        console.log("Login.tsx handleLogin: Stored userSession in localStorage:", userData);
+
+        // --- Redirection Logic (based on current login) ---
+        // Redirect user based on username after successful "login".
         if (userData.name.toLowerCase() === 'admin') {
-            navigate('/add-product');
-            console.log("Login.jsx handleLogin: Navigating to /add-product (admin)");
+            // Navigate admin users to the Add Product page
+            navigate('/add-product'); 
+             // Debugging log
+            console.log("Login.tsx handleLogin: Navigating to /add-product (admin)");
         } else {
-            navigate('/home');
-            console.log("Login.jsx handleLogin: Navigating to /home (non-admin)");
+            // Navigate regular users to the Home page
+            navigate('/home'); 
+            // Debugging log
+            console.log("Login.tsx handleLogin: Navigating to /home (non-admin)");
         }
     };
 
+    // --- Component Rendering (JSX) ---
     return (
-        <Container fluid className="vh-100"> {/* Use 'fluid' and vh-100 for full viewport */}
-            <Row className="justify-content-center align-items-center h-100"> {/* Centering row with full height */}
-                <Col md={4}> {/* Adjust md value (e.g., 4, 5, 6) to control form width */}
-                    <div className="p-5 rounded shadow" style={{ backgroundColor: '#f8f9fa' }}> {/* Optional: Styling for the form container */}
+        // Use React Bootstrap components for layout and styling
+        // fluid=true makes the container span the full width
+        // vh-100 makes the container span the full viewport height
+        <Container fluid className="vh-100"> 
+            {/* Center the content vertically and horizontally within the container */}
+            <Row className="justify-content-center align-items-center h-100"> 
+                {/* Control the width of the form container on medium screens and up */}
+                <Col md={4}> 
+                    {/* Optional wrapper div for padding, background, shadow, rounded corners */}
+                    <div
+                        className="p-5 rounded shadow"
+                        style={{
+                            background: 'linear-gradient(135deg, #1e3c72, #2a5298', /* Futuristic gradient */
+                            color: '#ffffff', /* Light text for contrast */
+                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', /* Enhanced shadow */
+                        }}
+                    > 
+                        {/* Form element using React Bootstrap, calls handleLogin on submit */}
                         <Form onSubmit={handleLogin}>
-                            <h2 className="text-center mb-4">Login</h2> {/* Optional: Login heading */}
+                            <h2 className="text-center mb-4">Login</h2> 
+                            {/* Form group for the username input */}
                             <Form.Group controlId="usernameInput" className="mb-3">
                                 <Form.Label>Username</Form.Label>
+                                {/* Controlled input: value linked to state, onChange updates state */}
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter username"
                                     value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
+                                    // Update username state on every change in the input field
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} // Added type for event 'e'
                                 />
                             </Form.Group>
+                            {/* Submit button */}
                             <Button variant="primary" type="submit" className="w-100">
                                 Login
                             </Button>

@@ -1,190 +1,211 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+// Removed unused import `useSelector` as it is not used in this component.
+import React, { useState, useMemo, useCallback } from 'react';
+import { useAppDispatch } from '../store';
 import { fetchProducts } from '../features/products/productsSlice';
 import { addToCart } from '../features/cart/cartSlice';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Button, Row, Col, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { Product, ProductRating } from '../types/interfaces';
 
+/**
+ * ProductCatalog Component
+ * This component is responsible for displaying a list of products with features like sorting, filtering, and searching.
+ * It uses React Query for data fetching and Redux for managing cart state.
+ */
 function ProductCatalog() {
-    const dispatch = useDispatch();
-    const { t } = useTranslation();
+    // --- Redux and Translation Setup ---
+    const dispatch = useAppDispatch(); // Custom hook to dispatch Redux actions.
+    const { t } = useTranslation(); // Translation hook for internationalization.
 
-    // --- Data Fetching with react-query ---
-    // Fetch products using redux thunk (productsSlice)
-    const { data: products, status, error, refetch: refetchProducts } = useQuery({
-        queryKey: ['products'],
-        queryFn: () => dispatch(fetchProducts()).unwrap(), // Dispatch redux thunk to fetch products
-    });
+    // --- Data Fetching with React Query ---
+    /**
+     * Fetches the list of products using React Query and Redux.
+     * The `fetchProducts` action is dispatched and its result is unwrapped for use.
+     */
+    const { 
+        data: products, // The fetched products data.
+        error, // Error object if the query fails.
+        refetch: refetchProducts, // Function to manually refetch products.
+        isPending: productsIsPending, // Boolean indicating if the query is loading.
+        isError: productsIsError // Boolean indicating if the query encountered an error.
+    } = useQuery<Product[]>({
+        queryKey: ['products'], // Unique key for caching this query.
+        queryFn: () => dispatch(fetchProducts()).unwrap(), // Fetch products using Redux action.
+    });
 
-    // Fetch categories directly from fakestoreapi
-    const { data: categories, status: categoriesStatus, error: categoriesError, refetch: refetchCategories } = useQuery({
-        queryKey: ['categories'],
-        queryFn: async () => {
-            const response = await fetch('https://fakestoreapi.com/products/categories');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const fetchedCategories = await response.json();
-            return fetchedCategories;
-        },
-    });
+    /**
+     * Fetches the list of product categories directly from the API.
+     * This query is independent of Redux and uses React Query's built-in functionality.
+     */
+    const { 
+        data: categories, // The fetched categories data.
+        error: categoriesError, // Error object for categories query.
+        refetch: refetchCategories, // Function to manually refetch categories.
+        isPending: categoriesIsPending, // Boolean indicating if the categories query is loading.
+        isError: categoriesIsError // Boolean indicating if the categories query encountered an error.
+    } = useQuery<string[]>({
+        queryKey: ['categories'], // Unique key for caching this query.
+        queryFn: async () => {
+            const response = await fetch('https://fakestoreapi.com/products/categories');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return (await response.json()) as string[];
+        },
+    });
 
-    // --- Local State for UI controls ---
-    const [sortOption, setSortOption] = useState('default');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('all'); // Default to 'all' categories
+    // --- Local State for UI Controls ---
+    /**
+     * State variables to manage user interactions:
+     * - `sortOption`: Controls the sorting of products (e.g., by price or rating).
+     * - `searchQuery`: Stores the user's search input.
+     * - `selectedCategory`: Filters products by the selected category.
+     */
+    const [sortOption, setSortOption] = useState('default'); 
+    const [searchQuery, setSearchQuery] = useState(''); 
+    const [selectedCategory, setSelectedCategory] = useState('all'); 
 
+    // --- Memoized Derived Data (Sorting & Filtering) ---
+    /**
+     * Sorts the products based on the selected sorting option.
+     * Uses `useMemo` to optimize performance by avoiding unnecessary recalculations.
+     */
+    const sortedProducts = useMemo(() => {
+        const productsArray = products ?? []; // Fallback to an empty array if products are undefined.
+        switch (sortOption) {
+            case 'price-low-to-high':
+                return [...productsArray].sort((a, b) => a.price - b.price);
+            case 'price-high-to-low':
+                return [...productsArray].sort((a, b) => b.price - a.price);
+            case 'rating':
+                return [...productsArray].sort((a, b) => b.rating.rate - a.rating.rate); 
+            default:
+                return productsArray;
+        }
+    }, [products, sortOption]);
 
-    // --- Memoized product lists for sorting and filtering ---
-    // Sort products based on sortOption
-    const sortedProducts = useMemo(() => {
-        if (!products) return [];
-        // Ensure products is an array before sorting
-        const productsArray = Array.isArray(products) ? products : Object.values(products);
+    /**
+     * Filters the sorted products based on the selected category and search query.
+     * Uses `useMemo` to optimize performance by avoiding unnecessary recalculations.
+     */
+    const filteredProducts = useMemo(() => {
+        let categoryFilteredProducts = sortedProducts;
+        if (selectedCategory !== 'all') { 
+            categoryFilteredProducts = sortedProducts.filter(product => product.category === selectedCategory);
+        }
+        if (!searchQuery) {
+            return categoryFilteredProducts; 
+        }
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        return categoryFilteredProducts.filter(product => {
+            const titleMatch = product.title?.toLowerCase().includes(lowerCaseQuery);
+            const descriptionMatch = product.description?.toLowerCase().includes(lowerCaseQuery);
+            return titleMatch || descriptionMatch;
+        });
+    }, [sortedProducts, searchQuery, selectedCategory]);
 
-        switch (sortOption) {
-            case 'price-low-to-high':
-                return [...productsArray].sort((a, b) => a.price - b.price);
-            case 'price-high-to-low':
-                return [...productsArray].sort((a, b) => b.price - a.price);
-            case 'rating':
-                return [...productsArray].sort((a, b) => b.rating.rate - a.rating.rate); // Corrected sort order
-            default:
-                return productsArray;
-        }
-    }, [products, sortOption]);
+    // --- Action Dispatch Callback ---
+    /**
+     * Adds a product to the cart by dispatching the `addToCart` action.
+     * Uses `useCallback` to memoize the function and avoid unnecessary re-renders.
+     */
+    const handleAddToCart = useCallback((product: Product) => {
+        dispatch(addToCart(product)); 
+    }, [dispatch]);
 
-    // Filter products based on searchQuery and selectedCategory
-    const filteredProducts = useMemo(() => {
-        if (!sortedProducts) return [];
+    // --- Loading and Error State Rendering ---
+    /**
+     * Displays a loading message if either the products or categories are being fetched.
+     */
+    if (productsIsPending || categoriesIsPending) { 
+        return <div>{t('loadingProductsAndCategories')}...</div>;
+    }
 
-        // Category filtering
-        let categoryFilteredProducts = sortedProducts;
-        if (selectedCategory !== 'all') { // Filter only if a category is selected (not 'all')
-            categoryFilteredProducts = sortedProducts.filter(product => product.category === selectedCategory);
-        }
+    /**
+     * Displays an error message if either the products or categories queries fail.
+     */
+    if (productsIsError || categoriesIsError) {
+        const prodMsg = productsIsError ? error?.message : null;
+        const catMsg = categoriesIsError ? categoriesError?.message : null;
+        const combinedMsg = [prodMsg, catMsg].filter(Boolean).join('; ') || t('errorLoadingData');
+        return <div>Error: {combinedMsg}</div>; 
+    }
 
-        // Search query filtering
-        if (!searchQuery) {
-            return categoryFilteredProducts; // Return category-filtered products if no search query
-        }
+    // --- Main Component Render (JSX) ---
+    return (
+        <div>
+            {/* Search Input Control */}
+            <Form.Group className="mb-3" controlId="search-product">
+                <Form.Label>{t('searchProducts')}:</Form.Label>
+                <Form.Control
+                    type="search"
+                    placeholder={t('searchProducts')}
+                    value={searchQuery}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)} 
+                />
+            </Form.Group>
 
-        const lowerCaseQuery = searchQuery.toLowerCase();
-        return categoryFilteredProducts.filter(product => {
-            const titleMatch = product.title && product.title.toLowerCase().includes(lowerCaseQuery);
-            const descriptionMatch = product.description && product.description.toLowerCase().includes(lowerCaseQuery);
-            return titleMatch || descriptionMatch;
-        });
-    }, [sortedProducts, searchQuery, selectedCategory]);
+            {/* Category Filter Dropdown */}
+            <Form.Group className="mb-3" controlId="category-select">
+                <Form.Label>{t('filterByCategory')}:</Form.Label>
+                <Form.Select
+                    value={selectedCategory}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedCategory(e.target.value)} 
+                >
+                    <option value="all">{t('All Categories')}</option> 
+                    {categories && categories.map((category) => ( 
+                        <option key={category} value={category}>{category}</option> 
+                    ))}
+                </Form.Select>
+            </Form.Group>
 
+            {/* Sort Options Dropdown */}
+            <Form.Group className="mb-3" controlId="sort-select">
+                <Form.Label>{t('sortBy')}:</Form.Label>
+                <Form.Select
+                    value={sortOption}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortOption(e.target.value)} 
+                >
+                    <option value="default">{t('defaultSorting')}</option>
+                    <option value="price-low-to-high">{t('priceLowToHigh')}</option>
+                    <option value="price-high-to-low">{t('priceHighToLow')}</option>
+                    {products && products[0]?.rating && <option value="rating">{t('rating')}</option>} 
+                </Form.Select>
+            </Form.Group>
 
-    // --- useEffect hooks for data fetching ---
-    // Fetch products when component mounts or when refetch is called manually
-    useEffect(() => {
-        if (status === 'idle') {
-            refetchProducts(); // Use refetchProducts for products
-        }
-    }, [status, refetchProducts]); // Depend on refetchProducts
-
-
-    // Fetch categories when component mounts or when refetchCategories is called manually
-    useEffect(() => {
-        if (categoriesStatus === 'idle') {
-            refetchCategories(); // Use refetchCategories for categories
-        }
-    }, [categoriesStatus, refetchCategories]); // Depend on refetchCategories
-
-
-    // --- useCallback for adding to cart ---
-    const handleAddToCart = useCallback((product) => {
-        dispatch(addToCart(product));
-    }, [dispatch]);
-
-
-    // --- Loading and Error states ---
-    if (status === 'loading' || categoriesStatus === 'loading') {
-        return <div>{t('loadingProductsAndCategories')}...</div>;
-    }
-
-    if (status === 'failed' || categoriesStatus === 'failed') {
-        return <div>Error: {error?.message || categoriesError?.message || t('errorLoadingData')}</div>; // Display error messages
-    }
-
-
-    return (
-        <div>
-            {/* Search Input */}
-            <Form.Group className="mb-3" controlId="search-product">
-                <Form.Label>{t('searchProducts')}:</Form.Label>
-                <Form.Control
-                    type="search"
-                    placeholder={t('searchProducts')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-            </Form.Group>
-
-            {/* Category Filter Dropdown */}
-            <Form.Group className="mb-3" controlId="category-select">
-                <Form.Label>{t('filterByCategory')}:</Form.Label>
-                <Form.Select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                    <option value="all">{t('All Categories')}</option>
-                    {categories && categories.map((category) => (
-                        <option key={category} value={category}>{category}</option>
-                    ))}
-                </Form.Select>
-            </Form.Group>
-
-            {/* Sort Options Dropdown */}
-            <Form.Group className="mb-3" controlId="sort-select">
-                <Form.Label>{t('sortBy')}:</Form.Label>
-                <Form.Select
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                >
-                    <option value="default">{t('defaultSorting')}</option>
-                    <option value="price-low-to-high">{t('priceLowToHigh')}</option>
-                    <option value="price-high-to-low">{t('priceHighToLow')}</option>
-                    {products && products[0] && products[0].rating && <option value="rating">{t('rating')}</option>}
-                </Form.Select>
-            </Form.Group>
-
-            {/* Product Grid */}
-            <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-                {filteredProducts.map((product) => (
-                    <Col key={product.id} data-testid={`product-col-${product.id}`}>
-                        <Card data-testid={`product-card-${product.id}`}>
-                            <Card.Img
-                                variant="top"
-                                src={product.image}
-                                alt={product.title}
-                                style={{ height: '200px', objectFit: 'contain' }}
-                            />
-                            <Card.Body>
-                                <Card.Title  data-testid={`product-title-${product.id}`}>{product.title}</Card.Title>
-                                <Card.Text  data-testid={`product-price-${product.id}`}>{t('price')}: ${product.price}</Card.Text>
-                                {product.rating && <Card.Text data-testid={`product-rating-${product.id}`}>{t('rating')}: {product.rating.rate} ({product.rating.count} reviews)</Card.Text>}
-                                <Button
-                                    variant="primary"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleAddToCart(product);
-                                    }}
-                                    data-testid={`add-to-cart-button-${product.id}`} // Added data-testid for testing
-                                >
-                                    {t('addToCart')}
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
-        </div>
-    );
+            {/* Product Grid Layout */}
+            <Row className="product-grid" style={{ maxWidth: '100%' }}>
+                {filteredProducts.map((product) => ( 
+                    <Col key={product.id} data-testid={`product-col-${product.id}`}>
+                        <Card data-testid={`product-card-${product.id}`}>
+                            <Card.Img
+                                variant="top"
+                                src={product.image}
+                                alt={product.title}
+                                style={{ height: '200px', objectFit: 'contain' }} 
+                            />
+                            <Card.Body>
+                                <Card.Title data-testid={`product-title-${product.id}`}>{product.title}</Card.Title>
+                                <Card.Text data-testid={`product-price-${product.id}`}>{t('price')}: ${product.price.toFixed(2)}</Card.Text>
+                                {product.rating && <Card.Text data-testid={`product-rating-${product.id}`}>{t('rating')}: {product.rating.rate} ({product.rating.count} reviews)</Card.Text>}
+                                <Button
+                                    variant="primary"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); 
+                                        handleAddToCart(product); 
+                                    }}
+                                    data-testid={`add-to-cart-button-${product.id}`}
+                                >
+                                    {t('addToCart')}
+                                </Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+        </div>
+    );
 }
 
 export default ProductCatalog;

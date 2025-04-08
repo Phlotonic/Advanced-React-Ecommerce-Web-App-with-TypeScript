@@ -21,7 +21,7 @@ const productSlice = createSlice({
     initialState: {
         items: [],
         status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-        error: null,
+        error: null as string | null,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -36,7 +36,7 @@ const productSlice = createSlice({
             })
             .addCase(fetchProducts.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.error.message;
+                state.error = action.error.message ?? null;
             });
     },
 });
