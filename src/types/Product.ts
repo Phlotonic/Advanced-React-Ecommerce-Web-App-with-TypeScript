@@ -1,14 +1,14 @@
 // --- Type Definitions ---
 
 // Defines the structure for the nested 'rating' object within a Product
-interface ProductRating {
+export interface ProductRating {
     rate: number;
     count: number;
 }
 
 // Defines the structure for a single Product object based on fakestoreapi data
 // Used for type safety throughout the app.
-interface Product {
+export interface Product {
     id: number;
     title: string;
     price: number;
@@ -17,4 +17,3 @@ interface Product {
     image: string;
     rating: ProductRating; // Uses the nested ProductRating interface
 }
-

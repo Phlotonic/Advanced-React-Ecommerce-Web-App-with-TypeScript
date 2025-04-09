@@ -6,7 +6,7 @@ import { addToCart } from '../features/cart/cartSlice';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Button, Row, Col, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { Product, ProductRating } from '../types/interfaces';
+import { Product, ProductRating } from '../types/Product';
 
 /**
  * ProductCatalog Component

@@ -115,8 +115,6 @@ function OrderHistory() {
                     <p>{t('tryAgainLater')}</p>
                     {/* Display the error message. Use optional chaining (?.) as error might be null. */}
                     <p>{t('orderHistoryError')}: {error?.message}</p> 
-                    {/* Duplicated error message line - might be intentional or a typo? */}
-                    <p>{t('productDataError')}: {error?.message}</p> 
                 </Alert>
             </Container>
         );
@@ -135,6 +133,12 @@ function OrderHistory() {
         );
     }
 
+    // Sanitize the orderHistory data to ensure totalPrice is always a number
+    const sanitizedOrderHistory = orderHistory.map(order => ({
+        ...order,
+        totalPrice: typeof order.totalPrice === 'number' ? order.totalPrice : parseFloat(order.totalPrice) || 0,
+    }));
+
     // --- Render Order History Table (Success State) ---
     // This section renders only if data fetching was successful and there are orders to display.
     return (
@@ -152,10 +156,10 @@ function OrderHistory() {
                         <th>{t('totalPrice')}</th>
                     </tr>
                 </thead>
-                {/* Table Body - Iterate over the fetched orderHistory array */}
+                {/* Table Body - Iterate over the sanitizedOrderHistory array */}
                 <tbody>
                     {/* Map each 'order' object (correctly typed as 'Order' due to useQuery<Order[]>) to a table row */}
-                    {orderHistory.map(order => ( 
+                    {sanitizedOrderHistory.map(order => ( 
                         // Use a unique key for each row, essential for React list rendering
                         <tr key={order.orderId}> 
                             {/* Display Order ID */}

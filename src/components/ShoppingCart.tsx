@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-// Import the typed dispatch hook and RootState type
 import { useAppDispatch, RootState } from '../store'; 
 import { removeFromCart, clearCart } from '../features/cart/cartSlice';
 import { Container, Row, Col, Button, Table, Image, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getOrdersFromLocalStorage, saveOrderToLocalStorage } from '../utils/localStorageHelpers';
+import { Order } from '../types/Order';
 
 // --- Type Definitions ---
 
@@ -32,17 +33,29 @@ interface CartItem extends Product {
     quantity: number;
 }
 
-// Define the structure for an order object (matching OrderHistory)
-// Ensure ProductItem here matches CartItem structure if applicable, or use CartItem[] directly
-interface ProductItem extends Product { // Re-using ProductItem name, ensure structure matches CartItem if needed
-    quantity: number; // Make sure this matches what OrderHistory expects
-}
-interface Order {
-    orderId: string; // Typically string IDs are better
-    dateCreated: string; // ISO string format is standard
-    items: ProductItem[]; // Array of items in the order
-    totalPrice: number; // Use number for calculations, format later
-}
+// --- Session Storage Helpers ---
+
+/**
+ * Retrieves the cart items array from sessionStorage.
+ * @returns {CartItem[]} An array of CartItem objects or an empty array.
+ */
+const getCartFromSessionStorage = (): CartItem[] => {
+    const cart = sessionStorage.getItem('shoppingCart');
+    try {
+        return cart ? JSON.parse(cart) as CartItem[] : [];
+    } catch (error) {
+        console.error("Error parsing shopping cart from sessionStorage:", error);
+        return [];
+    }
+};
+
+/**
+ * Saves the cart items array to sessionStorage.
+ * @param cartItems - The array of CartItem objects to save.
+ */
+const saveCartToSessionStorage = (cartItems: CartItem[]) => {
+    sessionStorage.setItem('shoppingCart', JSON.stringify(cartItems));
+};
 
 // --- Component ---
 
@@ -55,6 +68,11 @@ function ShoppingCart() {
     const cartItems = useSelector((state: RootState): CartItem[] => state.cart.items); 
     // Get translation function
     const { t } = useTranslation(); 
+
+    // Sync cart state with sessionStorage
+    useEffect(() => {
+        saveCartToSessionStorage(cartItems);
+    }, [cartItems]);
 
     // --- Event Handlers & Logic ---
 
@@ -83,34 +101,6 @@ function ShoppingCart() {
         return cartItems.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0); 
     };
 
-    // --- Local Storage Helpers --- (Consider moving to a separate utility file)
-
-    /**
-     * Retrieves the order history array from localStorage.
-     * @returns {Order[]} An array of Order objects or an empty array.
-     */
-    const getOrdersFromLocalStorage = (): Order[] => {
-        const orders = localStorage.getItem('orderHistory');
-        try {
-            // Parse stored orders, asserting the type (use carefully, assumes data is valid)
-            return orders ? JSON.parse(orders) as Order[] : []; 
-        } catch (error) {
-            console.error("Error parsing order history from localStorage:", error);
-            return []; // Return empty array if parsing fails
-        }
-    };
-
-    /**
-     * Saves a new order object to the order history in localStorage.
-     * Appends the new order to any existing orders.
-     * @param order - The new Order object to save.
-     */
-    const saveOrderToLocalStorage = (order: Order) => { // Add type for order parameter
-        const existingOrders = getOrdersFromLocalStorage();
-        // Add the new order and save the updated array back to localStorage
-        localStorage.setItem('orderHistory', JSON.stringify([...existingOrders, order]));
-    };
-
     // --- Checkout Simulation ---
 
     /**
@@ -129,18 +119,28 @@ function ShoppingCart() {
                 const orderTotal = calculateTotal(); 
                 // Create a shallow copy of cart items for the order
                 // Ensure CartItem structure is compatible with Order['items'] (ProductItem[])
-                const orderItems: ProductItem[] = [...cartItems]; 
+                const orderItems = cartItems.map(item => ({
+                    productId: item.id.toString(), // Convert id to string and rename to productId
+                    quantity: item.quantity,
+                    price: item.price,
+                }));
 
                 // Create the new order object, conforming to the Order interface
                 const newOrder: Order = {
-                    orderId: orderId,
-                    dateCreated: orderDate,
-                    totalPrice: orderTotal, // Use the number value
+                    id: orderId, // Use the same value as orderId for uniqueness
+                    date: orderDate, // Use the same value as dateCreated
                     items: orderItems,
+                    totalAmount: orderTotal, // Use the number value
+                    orderId: orderId, // Add missing orderId property
+                    dateCreated: orderDate, // Add missing dateCreated property
+                    totalPrice: orderTotal, // Add missing totalPrice property
                 };
 
                 // Save the newly created order
                 saveOrderToLocalStorage(newOrder);
+
+                // Clear sessionStorage during checkout
+                sessionStorage.removeItem('shoppingCart');
 
                 // Log simulation details and show a confirmation alert
                 console.log("Simulating Order Creation - Order:", newOrder);
@@ -192,35 +192,27 @@ function ShoppingCart() {
                 </thead>
                 {/* Table Body - Map over cart items */}
                 <tbody>
-                    {/* Each 'item' is typed as CartItem due to useSelector typing */}
-                    {cartItems.map(item => ( 
-                        // Use item ID as the unique key
-                        <tr key={item.id}> 
-                            {/* Product Column: Image and Title */}
+                    {cartItems.map(item => (
+                        <tr key={item.id}>
                             <td>
                                 <Image
                                     src={item.image}
                                     alt={item.title}
                                     style={{ width: '50px', height: '50px', objectFit: 'contain' }}
-                                    thumbnail // Adds a small border/padding
-                                    className="me-2" // Margin end for spacing
+                                    thumbnail
+                                    className="me-2"
                                 />
                                 {item.title}
                             </td>
-                            {/* Price Column */}
-                            <td>${item.price.toFixed(2)}</td> {/* Format price */}
-                            {/* Quantity Column */}
+                            <td>${item.price.toFixed(2)}</td>
                             <td>{item.quantity}</td>
-                            {/* Item Total Column */}
-                            <td>${(item.price * item.quantity).toFixed(2)}</td> {/* Format item total */}
-                            {/* Actions Column */}
+                            <td>${(item.price * item.quantity).toFixed(2)}</td>
                             <td>
-                                {/* Remove Button */}
-                                <Button 
-                                    variant="danger" 
-                                    size="sm" 
-                                    aria-label={`Remove ${item.title} from cart`} // Accessibility label
-                                    onClick={() => handleRemoveFromCart(item.id)} // Pass item ID to handler
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    aria-label={`Remove ${item.title} from cart`}
+                                    onClick={() => handleRemoveFromCart(item.id)}
                                 >
                                     {t('remove')}
                                 </Button>
