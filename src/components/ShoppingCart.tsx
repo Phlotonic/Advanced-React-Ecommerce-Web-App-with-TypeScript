@@ -125,15 +125,14 @@ function ShoppingCart() {
                     price: item.price,
                 }));
 
-                // Create the new order object, conforming to the Order interface
+                // New order object, conforming to the Order interface
                 const newOrder: Order = {
-                    id: orderId, // Use the same value as orderId for uniqueness
-                    date: orderDate, // Use the same value as dateCreated
+                    id: orderId,
+                    date: orderDate,
                     items: orderItems,
-                    totalAmount: orderTotal, // Use the number value
-                    orderId: orderId, // Add missing orderId property
-                    dateCreated: orderDate, // Add missing dateCreated property
-                    totalPrice: orderTotal, // Add missing totalPrice property
+                    totalPrice: orderTotal,
+                    orderId: orderId,
+                    dateCreated: orderDate,
                 };
 
                 // Save the newly created order

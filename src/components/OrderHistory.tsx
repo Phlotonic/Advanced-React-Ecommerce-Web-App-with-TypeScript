@@ -7,6 +7,13 @@ import { Order } from '../types/Order';
 
 // --- Type Definitions ---
 
+// Define the structure for a single item within an order
+interface ProductItem {
+    productId: string;
+    quantity: number;
+    price: number;
+}
+
 /**
  * OrderHistory Component
  * Fetches and displays a list of past orders for the user.
