@@ -7,7 +7,7 @@ export const useCartCount = () => {
 
     useEffect(() => {
         // Simulate fetching cart count from a database or local storage
-        // For demonstration, we'll just increase the count by 1 every second
+        // Increase the count by 1 every second
         const interval = setInterval(() => {
             setCartCount((currentCount) => currentCount + 1);
         }, 1000);

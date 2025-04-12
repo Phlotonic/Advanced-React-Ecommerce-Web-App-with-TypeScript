@@ -1,11 +1,10 @@
-// Import necessary hooks and components from React, React Router, React Redux, Context, and React Bootstrap
-import React, { useContext, useEffect } from 'react'; // Import React and hooks
-import type { RootState } from '../store'; // Import the RootState type for useSelector
-import UserContext from '../context/UserContext'; // Import the context for user data
-import { Container } from 'react-bootstrap'; // Import layout component
-import { useSelector } from 'react-redux'; // Import hook to select data from Redux store
-import ProductCatalog from './ProductCatalog'; // Import the component that displays products
-import { Link, NavLink, useNavigate } from 'react-router-dom'; // Import routing components
+import React, { useContext, useEffect } from 'react';
+import type { RootState } from '../store';
+import UserContext from '../context/UserContext';
+import { Container } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import ProductCatalog from './ProductCatalog';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 /**
  * HomePage Component
@@ -51,7 +50,7 @@ function HomePage() {
                 const userSession = JSON.parse(storedUser); 
                 
                 // **Important Check:** Although the outer 'if' already checked, this double-check ensures 
-                // we only call setUser if the context *still* shows the user as logged out.
+                // we only call setUser if the context still shows the user as logged out.
                 // This prevents unnecessary re-renders or potential race conditions if the context 
                 // state updated between the top check and here.
                 if (!user.isLoggedIn) { 
@@ -95,5 +94,4 @@ function HomePage() {
     );
 }
 
-// Export the component for use in routing
 export default HomePage;

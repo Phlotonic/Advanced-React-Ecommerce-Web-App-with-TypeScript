@@ -1,19 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
-// Import the UserContext to access shared user state and setter function
 import UserContext from '../context/UserContext'; 
-// Import useNavigate for programmatic redirection after login
 import { useNavigate } from 'react-router-dom';
-// Import layout and form components from React Bootstrap
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-// If UserState is exported from UserContext.tsx, prefer importing it:
-// import type { UserState } from '../context/UserContext'; 
 
 // Defines the structure for user data used locally in this component.
-// For consistency, consider importing 'UserState' from UserContext.tsx if it matches.
 interface User {
     name: string;
     isLoggedIn: boolean;
-    // Add other properties if defined in UserState from context
 }
 
 /**
@@ -21,7 +14,7 @@ interface User {
  * Handles user login by taking a username, updating the global user context,
  * saving the session to localStorage, and redirecting the user.
  * Also attempts to automatically log in user if a valid session exists in localStorage.
- * NOTE: This version simulates login based on username only; no password or API call involved.
+ * This version simulates login based on username only; no password or API call involved.
  */
 function Login() {
     // --- State and Context ---
@@ -35,8 +28,8 @@ function Login() {
 
     // --- Effects ---
 
-    // This effect runs once when the component mounts (due to stable 'navigate' dependency).
-    // Its purpose is to check if a user session already exists in localStorage and automatically log the user in.
+    // This effect runs once when the component mounts (due to stable 'navigate' dependency) 
+    // to check if a user session already exists in localStorage and automatically log the user in.
     useEffect(() => {
         // Debugging log
         console.log("Login.tsx useEffect: Checking for stored user session...");
@@ -50,7 +43,6 @@ function Login() {
             try {
                 // Attempt to parse the stored JSON string back into an object.
                 // Explicitly typing the parsed result to match the expected User structure.
-                // Using UserState imported from context would be more consistent if available.
                 const userSession: User = JSON.parse(storedUser); 
                 // Debugging log
                 console.log("Login.tsx useEffect: Parsed userSession:", userSession);
@@ -140,17 +132,14 @@ function Login() {
         // fluid=true makes the container span the full width
         // vh-100 makes the container span the full viewport height
         <Container fluid className="vh-100"> 
-            {/* Center the content vertically and horizontally within the container */}
             <Row className="justify-content-center align-items-center h-100"> 
-                {/* Control the width of the form container on medium screens and up */}
-                <Col md={4}> 
-                    {/* Optional wrapper div for padding, background, shadow, rounded corners */}
+                <Col md={4}>
                     <div
                         className="p-5 rounded shadow"
                         style={{
-                            background: 'linear-gradient(135deg, #1e3c72, #2a5298', /* Futuristic gradient */
-                            color: '#ffffff', /* Light text for contrast */
-                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', /* Enhanced shadow */
+                            background: 'linear-gradient(135deg, #1e3c72, #2a5298',
+                            color: '#ffffff',
+                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
                         }}
                     > 
                         {/* Form element using React Bootstrap, calls handleLogin on submit */}
@@ -168,7 +157,6 @@ function Login() {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} // Added type for event 'e'
                                 />
                             </Form.Group>
-                            {/* Submit button */}
                             <Button variant="primary" type="submit" className="w-100">
                                 Login
                             </Button>

@@ -2,12 +2,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // --- Type Definitions ---
-// Assuming Product and CartItem types are defined elsewhere (e.g., shared types file or relevant component)
-// If not, define them here or import them. Let's assume they exist and look like this:
-// import type { Product } from './productTypes'; // Example import
 
 // Define structure for items stored in the cart (Product + quantity)
-interface CartItem { // Replace with import if defined elsewhere
+interface CartItem {
     id: number; 
     title: string;
     price: number;
@@ -21,8 +18,8 @@ interface CartItem { // Replace with import if defined elsewhere
 // Define the shape of the state managed by this cart slice
 interface CartState {
     items: CartItem[]; // An array of items currently in the cart
-    totalItems: number; // The total count of all individual items (sum of quantities)
-    totalPrice: number; // The total price of all items in the cart
+    totalItems: number; 
+    totalPrice: number; 
 }
 
 // --- Initial State ---
@@ -41,7 +38,6 @@ const cartSlice = createSlice({
     name: 'cart', // Name of the slice, used in action types
     initialState, // The initial state defined above
     // Reducers define how the state can be updated in response to dispatched actions.
-    // Redux Toolkit uses Immer internally, allowing us to write "mutating" logic safely.
     reducers: {
         /**
          * Adds a product to the cart. If the product already exists, increments its quantity.
@@ -112,8 +108,6 @@ const cartSlice = createSlice({
                 // Set the item's quantity to the new value
                 state.items[itemIndex].quantity = quantity; 
             }
-            // Consider adding logic here to remove the item if quantity becomes 0, 
-            // or handle that via removeFromCart action elsewhere.
         },
 
         /**
@@ -139,5 +133,4 @@ export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlic
 // This will be added to the root reducer in the main store configuration.
 export default cartSlice.reducer;
 
-// Optional: Export the state type if needed elsewhere (e.g., for selectors)
 export type { CartState, CartItem };

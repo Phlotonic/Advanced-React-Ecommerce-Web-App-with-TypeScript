@@ -1,7 +1,6 @@
-// Import necessary React hooks, context, and routing functionality
-import React, { useContext, useEffect } from 'react'; // Added React import for completeness (though sometimes implicit)
-import UserContext from '../context/UserContext'; // Import context to access the setUser function
-import { useNavigate } from 'react-router-dom'; // Import hook for programmatic navigation
+import React, { useContext, useEffect } from 'react';
+import UserContext from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Logout Component
@@ -44,5 +43,4 @@ function Logout() {
     );
 }
 
-// Export the component for use in the application's routing setup
 export default Logout;

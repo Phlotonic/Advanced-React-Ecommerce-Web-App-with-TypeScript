@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-// Import UserContext and the UserState type (assuming it's exported from UserContext.tsx)
 import UserContext, { UserState } from '../context/UserContext'; 
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 

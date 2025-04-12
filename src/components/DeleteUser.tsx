@@ -1,8 +1,7 @@
-// Import necessary React hooks, routing, context, and UI components
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserContext from '../context/UserContext'; // Context for accessing user state and setter
-import { Container, Row, Col, Button, Alert } from 'react-bootstrap'; // UI components
+import UserContext from '../context/UserContext';
+import { Container, Row, Col, Button, Alert } from 'react-bootstrap';
 
 /**
  * DeleteUser Component
@@ -63,9 +62,9 @@ const DeleteUser = () => {
 
         // --- Local Logout and Cleanup ---
         // Assuming the simulated (or real) API call was successful:
-        // 1. Update the global user state via context to log the user out locally
+        // Update the global user state via context to log the user out locally
         setUser({ name: '', isLoggedIn: false }); 
-        // 2. Remove the user session data from local storage to prevent auto-login
+        // Remove the user session data from local storage to prevent auto-login
         localStorage.removeItem('userSession'); 
 
         // --- UI Feedback and Redirection ---
@@ -82,7 +81,7 @@ const DeleteUser = () => {
 
     // Handles the click on the "Cancel" button in the confirmation step
     const handleCancelDelete = () => {
-        // Simply hides the confirmation dialog, returning to the initial prompt
+        // Hides the confirmation dialog, returning to the initial prompt
         setShowConfirmation(false); 
     };
 
@@ -141,5 +140,4 @@ const DeleteUser = () => {
     );
 };
 
-// Export the component for use in routing/application structure
 export default DeleteUser;

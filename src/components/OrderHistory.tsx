@@ -1,38 +1,11 @@
 import React from 'react';
-// Import hook for data fetching and state management from TanStack Query (React Query)
 import { useQuery } from '@tanstack/react-query';
-// Import UI components from React Bootstrap
 import { Container, Table, Spinner, Alert } from 'react-bootstrap';
-// Import Link component for navigation from React Router
 import { Link } from 'react-router-dom';
-// Import hook for internationalization (translation)
 import { useTranslation } from 'react-i18next';
+import { Order } from '../types/Order';
 
 // --- Type Definitions ---
-
-/**
- * Defines the structure for a single item within an order.
- * Used for type safety when processing order data.
- */
-interface ProductItem {
-    id: number; 
-    name: string; 
-    price: number; 
-    quantity: number; 
-    // Add other product properties if they exist in the stored data
-}
-
-/**
- * Defines the structure for a single order object.
- * Used for type safety when fetching and displaying order history.
- */
-interface Order {
-    orderId: string | number; // Unique identifier for the order
-    dateCreated: string | number; // Timestamp or date string when the order was created
-    items: ProductItem[]; // An array containing the products in this order
-    totalPrice: number; // The total price calculated for the order
-    // Add any other relevant order properties (e.g., status, shippingAddress) if they exist
-}
 
 /**
  * OrderHistory Component
@@ -60,8 +33,7 @@ function OrderHistory() {
     
     /**
      * Asynchronous function designed to be used as the 'queryFn' for React Query.
-     * It simulates a network delay and then fetches order history from localStorage.
-     * In a real application, this would likely fetch data from a backend API endpoint.
+     * Simulates a network delay and then fetches order history from localStorage.
      * @returns {Promise<Order[]>} A promise that resolves to the array of orders.
      */
     const fetchOrderHistory = async (): Promise<Order[]> => {
@@ -191,5 +163,4 @@ function OrderHistory() {
     );
 }
 
-// Export the component
 export default OrderHistory;

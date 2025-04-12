@@ -1,4 +1,3 @@
-// Removed unused import `useSelector` as it is not used in this component.
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAppDispatch } from '../store';
 import { fetchProducts } from '../features/products/productsSlice';

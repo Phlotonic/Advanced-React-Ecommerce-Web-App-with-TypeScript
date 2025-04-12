@@ -1,5 +1,4 @@
 import React from 'react';
-// Import the core hook from the react-i18next library
 import { useTranslation } from 'react-i18next';
 
 /**

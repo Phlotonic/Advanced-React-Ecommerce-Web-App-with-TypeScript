@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react'; // Import Dispatch and SetStateAction
+import React, { Dispatch, SetStateAction } from 'react';
 
 // 1. Define the type for the user state object
 interface UserState {

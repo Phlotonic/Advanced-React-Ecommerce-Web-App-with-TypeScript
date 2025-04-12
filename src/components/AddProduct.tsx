@@ -1,4 +1,3 @@
-// Import necessary hooks and components from React, React Query, and React Bootstrap
 import React, { useState } from 'react'; 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert, Button, Col, Form } from 'react-bootstrap';
@@ -191,5 +190,4 @@ const AddProduct: React.FC = () => {
     );
 };
 
-// Export the component for use in other parts of the application
 export default AddProduct;

@@ -151,6 +151,7 @@ body {
 /* For medium and larger screens (768px and above) */
 @media (min-width: 768px) {
   .row.product-grid {
-    grid-template-columns: repeat(3, 1fr); /* Ensure 3 items per row on medium and larger screens */
+    grid-template-columns: repeat(3, 1fr); /* Ensure 3 items per row on medium and larger screens (this one was more difficult
+    than it needed to be! */
   }
 }
