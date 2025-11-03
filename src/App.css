@@ -13,7 +13,7 @@ body, html {
 /* Body and Background Enhancements */
 body {
   font-family: 'Roboto', sans-serif; /* Modern font */
-  background: linear-gradient(135deg, #1e3c72, #2a5298); /* Futuristic gradient background */
+  /* Background is now handled by AnimatedGradientBackground component */
   color: #e0e0e0; /* Light text for contrast */
   overflow-x: hidden; /* Prevent horizontal scrolling */
   line-height: 1.6;
