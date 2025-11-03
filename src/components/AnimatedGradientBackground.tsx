@@ -11,12 +11,20 @@ const AnimatedGradientBackground: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const rippleIdRef = useRef(0);
+  const timeoutIdsRef = useRef<Set<NodeJS.Timeout>>(new Set());
+  const rafIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth) * 100;
-      const y = (e.clientY / window.innerHeight) * 100;
-      setMousePosition({ x, y });
+      // Throttle mouse move updates using requestAnimationFrame
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          const x = (e.clientX / window.innerWidth) * 100;
+          const y = (e.clientY / window.innerHeight) * 100;
+          setMousePosition({ x, y });
+          rafIdRef.current = null;
+        });
+      }
     };
 
     const handleMouseClick = (e: MouseEvent) => {
@@ -28,10 +36,12 @@ const AnimatedGradientBackground: React.FC = () => {
       
       setRipples(prev => [...prev, newRipple]);
       
-      // Remove ripple after animation completes
-      setTimeout(() => {
+      // Remove ripple after animation completes, track timeout for cleanup
+      const timeoutId = setTimeout(() => {
         setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+        timeoutIdsRef.current.delete(timeoutId);
       }, 1500);
+      timeoutIdsRef.current.add(timeoutId);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -40,6 +50,15 @@ const AnimatedGradientBackground: React.FC = () => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('click', handleMouseClick);
+      
+      // Clean up pending timeouts
+      timeoutIdsRef.current.forEach(id => clearTimeout(id));
+      timeoutIdsRef.current.clear();
+      
+      // Clean up pending animation frame
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
     };
   }, []);
 
