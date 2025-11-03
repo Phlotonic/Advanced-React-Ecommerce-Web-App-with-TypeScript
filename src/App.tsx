@@ -14,6 +14,7 @@ import DeleteUser from './components/DeleteUser';
 import NotFound from './components/NotFound'; 
 import UserContext from './context/UserContext'; 
 import OrderHistory from './components/OrderHistory';
+import AnimatedGradientBackground from './components/AnimatedGradientBackground';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UserContext.Provider value={{ user, setUser }}>
+        <AnimatedGradientBackground />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
